@@ -5,6 +5,30 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+// Подпись: пароли берём ТОЛЬКО из keystore.properties (он в .gitignore), в коде их нет.
+val keystoreFile = rootProject.file("keystore.jks")
+val keystorePropsFile = rootProject.file("keystore.properties")
+val keystoreProps = Properties().apply {
+    if (keystorePropsFile.exists()) keystorePropsFile.inputStream().use { load(it) }
+}
+val signingReady = keystoreFile.exists() &&
+    listOf("storePassword", "keyAlias", "keyPassword").all { !keystoreProps.getProperty(it).isNullOrBlank() }
+
+// Без ключей релизная сборка падает с понятным сообщением, а не отдаёт молча неподписанный APK.
+if (!signingReady) {
+    gradle.taskGraph.whenReady {
+        val wantsSigned = allTasks.any {
+            it.project == project && it.name in setOf("assembleProd", "packageProd", "assembleRelease", "packageRelease")
+        }
+        if (wantsSigned) {
+            throw GradleException(
+                "Нет ключей подписи: положи в корень проекта keystore.jks и keystore.properties " +
+                    "(storePassword, keyAlias, keyPassword). Тесты и debug-сборка работают и без них."
+            )
+        }
+    }
+}
+
 android {
     namespace = "com.brotik.portfolio"
     compileSdk = 35
@@ -18,36 +42,31 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    val keystoreFile = rootProject.file("keystore.jks")
-    if (keystoreFile.exists()) {
-        val props = Properties().apply {
-            val f = rootProject.file("keystore.properties")
-            if (f.exists()) f.inputStream().use { load(it) }
-        }
+    if (signingReady) {
         signingConfigs {
             create("portfolio") {
                 storeFile = keystoreFile
-                storePassword = props.getProperty("storePassword") ?: "portfolio"
-                keyAlias = props.getProperty("keyAlias") ?: "portfolio"
-                keyPassword = props.getProperty("keyPassword") ?: "portfolio"
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
             }
         }
     }
 
     buildTypes {
         getByName("debug") {
-            if (keystoreFile.exists()) signingConfig = signingConfigs.getByName("portfolio")
+            if (signingReady) signingConfig = signingConfigs.getByName("portfolio")
         }
         getByName("release") {
             isMinifyEnabled = false
             isShrinkResources = false
-            if (keystoreFile.exists()) signingConfig = signingConfigs.getByName("portfolio")
+            if (signingReady) signingConfig = signingConfigs.getByName("portfolio")
         }
         // На этой машине путь app-release.apk иногда блокируется фильтром, поэтому релиз = prod.
         create("prod") {
             initWith(getByName("release"))
             isDebuggable = false
-            if (keystoreFile.exists()) signingConfig = signingConfigs.getByName("portfolio")
+            if (signingReady) signingConfig = signingConfigs.getByName("portfolio")
             matchingFallbacks += listOf("release")
         }
     }

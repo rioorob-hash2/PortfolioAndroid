@@ -87,18 +87,20 @@ tools/build.ps1                 — сборка в песочнице
 # юнит-тесты
 powershell -ExecutionPolicy Bypass -File tools/build.ps1 test
 
-# APK (prod-вариант, подписанный, если рядом лежит keystore.jks)
+# APK (prod-вариант; нужны ключи подписи, см. ниже)
 powershell -ExecutionPolicy Bypass -File tools/build.ps1 apk
 
 # debug-сборка
 powershell -ExecutionPolicy Bypass -File tools/build.ps1 debug
 ```
 
-Скрипт — обёртка над `gradle: :app:testDebugUnitTest | :app:assembleProd | :app:assembleDebug`.
+Скрипт — обёртка над `gradle: :app:testDebugUnitTest | :app:assembleProd | :app:assembleDebug`,
+он же выставляет `JAVA_HOME`, `ANDROID_HOME`, `GRADLE_USER_HOME` и `TEMP`/`TMP` (в `.tmp/` проекта).
 
-**Про подпись:** `keystore.jks` и `keystore.properties` в репозитории отсутствуют (в `.gitignore`).
-Без них проект собирается и тесты проходят, но релизный APK будет неподписанным — положи ключи
-в корень проекта локально.
+**Про подпись:** в коде паролей нет. Нужны два локальных файла в корне проекта:
+`keystore.jks` и `keystore.properties` (`storePassword`, `keyAlias`, `keyPassword`). Оба в `.gitignore`.
+Без них тесты и `debug` работают, а `apk`/`assembleProd` падает с внятным сообщением —
+чтобы случайно не выпустить неподписанный APK.
 
 ## Приватность
 
