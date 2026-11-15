@@ -1,0 +1,31 @@
+# Android / Gradle
+.gradle/
+.gradle*/
+build/
+.kotlin/
+captures/
+.externalNativeBuild/
+.cxx/
+*.iml
+local.properties
+*.apk
+*.aab
+
+# Подпись и секреты — никогда в репозиторий
+keystore.jks
+*.jks
+*.keystore
+keystore.properties
+*.env
+
+# Артефакты сборки, логи, временные каталоги
+dist/
+.tmp/
+*.log
+build*.log
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Портфель</string>
+
+    <string name="total_value">Стоимость</string>
+    <string name="invested">Вложено</string>
+    <string name="pnl">PnL</string>
+    <string name="avg_price">Средняя цена</string>
+    <string name="price_now">Цена сейчас</string>
+    <string name="amount">Количество</string>
+    <string name="share">Доля</string>
+    <string name="assets">Активы</string>
+    <string name="distribution">Распределение</string>
+    <string name="history_title">История</string>
+    <string name="history_24h">24 ч.</string>
+    <string name="history_7d">7 д.</string>
+    <string name="history_30d">30 д.</string>
+    <string name="history_90d">90 д.</string>
+    <string name="history_1y">Год</string>
+    <string name="history_loading">Загружаю историю…</string>
+    <string name="history_empty">Нет данных: цены с биржи недоступны</string>
+    <string name="history_hint">Стоимость портфеля за %1$s · %2$s</string>
+    <string name="history_change">изменение %1$s</string>
+    <string name="purchases">Докупки</string>
+    <string name="add_purchase">Добавить докупку</string>
+    <string name="add_asset">Добавить монету</string>
+    <string name="asset_symbol">Тикер (например, DOGE)</string>
+    <string name="asset_name">Название (необязательно)</string>
+    <string name="asset_color">Цвет</string>
+    <string name="ticker_invalid">2–10 символов: буквы и цифры</string>
+    <string name="ticker_exists">Такая монета уже есть</string>
+    <string name="asset_added">Монета добавлена</string>
+    <string name="asset_deleted">Монета удалена</string>
+    <string name="asset_title_hint">Необязательно — по умолчанию будет тикер</string>
+    <string name="delete_asset_title">Удалить %1$s?</string>
+    <string name="delete_asset_confirm">Монета %1$s и все её докупки будут удалены. Отменить это не получится.</string>
+    <string name="long_press_hint">Долгое нажатие на монету — удалить её</string>
+    <string name="edit_purchase">Изменить докупку</string>
+    <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
+    <string name="ok">Ок</string>
+    <string name="refresh">Обновить цены</string>
+    <string name="settings">Настройки</string>
+    <string name="back">Назад</string>
+
+    <string name="date">Дата</string>
+    <string name="kind_buy">Покупка</string>
+    <string name="kind_sell">Продажа</string>
+    <string name="sum_usd">Сумма, $</string>
+    <string name="sum_sell_usd">Сумма продажи, $</string>
+    <string name="price_usd">Цена покупки, $</string>
+    <string name="price_sell_usd">Цена продажи, $</string>
+    <string name="mark_only">Только пометка цены (без покупки)</string>
+    <string name="mark_only_hint">Запись переоценит портфель по этой цене, но не изменит количество.</string>
+    <string name="field_required">Заполни поле</string>
+    <string name="invalid_number">Некорректное число</string>
+    <string name="price_must_be_positive">Цена должна быть больше нуля</string>
+    <string name="saved">Сохранено</string>
+    <string name="deleted">Удалено</string>
+    <string name="no_purchases">Пока нет докупок. Добавь первую кнопкой «+».</string>
+    <string name="no_data">Нет данных</string>
+
+    <string name="updated_at">Цены обновлены: %1$s</string>
+    <string name="updated_short">Цены: %1$s</string>
+    <string name="prices_offline">Нет сети — показываю последние цены</string>
+    <string name="prices_error">Не удалось получить цены: %1$s</string>
+    <string name="price_source">Источник цен: %1$s</string>
+
+    <string name="backup_title">Резервная копия</string>
+    <string name="backup_desc">Копия одна: файл portfolio-latest.json перезаписывается при каждом сохранении, старые копии удаляются. Папку выбирать необязательно — без неё копия пишется в Загрузки/Portfolio.</string>
+    <string name="backup_folder">Папка для копий</string>
+    <string name="backup_folder_none">Не выбрана</string>
+    <string name="choose_folder">Выбрать папку</string>
+    <string name="auto_backup">Автоматическая копия при каждом изменении</string>
+    <string name="backup_now">Сделать копию сейчас</string>
+    <string name="backup_done">Копия сохранена</string>
+    <string name="backup_last">Последняя копия: %1$s</string>
+    <string name="backup_never">Копий ещё не было</string>
+    <string name="backup_failed">Не удалось сохранить копию: %1$s</string>
+    <string name="backup_need_folder">Сначала выбери папку для копий</string>
+    <string name="backup_download_only">Копия записана в Загрузки/Portfolio</string>
+
+    <string name="data_title">Данные</string>
+    <string name="export_json">Экспорт в файл</string>
+    <string name="import_json">Импорт из файла</string>
+    <string name="reset_seed">Вернуть данные из таблицы</string>
+    <string name="reset_seed_confirm">Заменить текущие данные исходными из таблицы?</string>
+    <string name="import_confirm">Импортировать данные из файла? Текущие данные будут заменены.</string>
+    <string name="import_ok">Импортировано записей: %1$d</string>
+    <string name="import_failed">Файл не подходит: %1$s</string>
+    <string name="export_done">Файл сохранён</string>
+    <string name="export_failed">Не удалось сохранить файл: %1$s</string>
+
+    <string name="about_title">О приложении</string>
+    <string name="about_text">Журнал докупок по монетам с живыми ценами и графиками. Данные хранятся на телефоне, резервные копии — в папке на устройстве.</string>
+    <string name="version">Версия %1$s</string>
+
+    <string name="chart_value">Стоимость</string>
+    <string name="chart_pnl">PnL</string>
+    <string name="chart_amount">Кол-во</string>
+    <string name="candle_title">Цена на рынке</string>
+    <string name="candle_day">День</string>
+    <string name="candle_week">Неделя</string>
+    <string name="candle_month">Месяц</string>
+    <string name="candle_year">Год</string>
+    <string name="target_title">Цель по цене</string>
+    <string name="target_none">Цель: не задана · нажми, чтобы задать</string>
+    <string name="target_set">Цель: %1$s · нажми, чтобы изменить</string>
+    <string name="target_clear">Убрать цель</string>
+    <string name="target_dialog_hint">Цена, $ (пусто — убрать цель)</string>
+    <string name="target_saved">Цель сохранена</string>
+    <string name="target_removed">Цель убрана</string>
+    <string name="candle_avg">Средняя накопления: %1$s · %2$s %3$s</string>
+    <string name="candles_empty">Нет данных с биржи</string>
+    <string name="candles_loading">Загружаю…</string>
+    <string name="candles_no_avg">Пока нет покупок — средняя появится после первой</string>
+    <string name="chart_invested">Вложено</string>
+
+    <string name="date_pick">Выберите дату</string>
+    <string name="restore_found">Найдена резервная копия (%1$s). Восстановить данные?</string>
+    <string name="restore_ok">Восстановить</string>
+    <string name="restore_done">Данные восстановлены из копии</string>
+    <string name="restore_skip">Позже</string>
+
+    <string name="today">Сегодня</string>
+
+    <string name="notif_channel_name">Уведомления по цене</string>
+    <string name="notif_channel_desc">Цена опустилась ниже средней или достигла цели</string>
+    <string name="notif_below_title">%1$s ниже средней на %2$s</string>
+    <string name="notif_below_text">Цена %1$s · средняя накопления %2$s</string>
+    <string name="notif_target_title">%1$s достиг цели</string>
+    <string name="notif_target_text">Цена %1$s · цель %2$s</string>
+
+    <string name="alerts_title">Уведомления по цене</string>
+    <string name="alerts_desc">Приложение проверяет цены в фоне (не чаще раза в 15 минут) и напоминает, когда монета дешевеет относительно твоей средней или доходит до цели.</string>
+    <string name="alerts_enabled">Включить уведомления</string>
+    <string name="alerts_below">«Ниже средней» на выбранный порог</string>
+    <string name="alerts_target">«Цель достигнута» по заданной цене</string>
+    <string name="alerts_threshold">Порог ниже средней, %</string>
+    <string name="alerts_check">Проверить сейчас</string>
+    <string name="alerts_allow">Разрешить уведомления</string>
+    <string name="alerts_perm_needed">Система блокирует уведомления. Нажми, чтобы разрешить.</string>
+    <string name="alerts_check_found">Сработало условий: %1$d — уведомления отправлены</string>
+    <string name="alerts_check_none">Сейчас условий нет — всё спокойно</string>
+    <string name="alerts_check_off">Уведомления выключены в настройках</string>
+    <string name="alerts_check_failed">Не удалось проверить: %1$s</string>
+    <string name="alerts_check_no_perm">Проверка прошла, но уведомления запрещены системой</string>
+    <string name="alerts_check_stale">Цены из кэша старше 2 часов — проверка может быть неточной</string>
+    <string name="alerts_spam_hint">Анти-спам: не чаще одного раза в сутки на пару «монета + тип».</string>
+
+    <string name="download_title">Копии в Загрузках</string>
+    <string name="download_desc">Каждый бэкап дополнительно пишется в общую папку Download/Portfolio — она переживает даже удаление приложения.</string>
+    <string name="download_find">Найти копии в Загрузках</string>
+    <string name="download_status">Копия в Загрузках: %1$s</string>
+    <string name="download_status_never">Копий в Загрузках пока нет</string>
+    <string name="download_status_failed">Не удалось записать копию в Загрузки — проверь доступ к памяти</string>
+    <string name="download_found">Копий в Загрузках: %1$d</string>
+    <string name="download_none">Копий в Загрузках нет</string>
+    <string name="download_none_hint">Копий не нашлось. После переустановки система может скрывать файлы прошлой установки — тогда восстанови вручную через «Импорт из файла».</string>
+    <string name="download_restore_found">Найдена копия в Загрузках (%1$s). Восстановить данные?</string>
+    <string name="download_import_confirm">Восстановить данные из «%1$s»? Текущие данные будут заменены.</string>
+
+    <string name="widget_title">Портфель</string>
+    <string name="widget_description">Стоимость портфеля и PnL на рабочем столе</string>
+    <string name="widget_updated">Цены: %1$s</string>
+    <string name="widget_no_data">Цены не загружены</string>
+</resources>
