@@ -150,8 +150,21 @@ class MainAdapter(
             val last = series.values.last()
             val up = last >= first
             val chartColor = ContextCompat.getColor(ctx, if (up) R.color.up else R.color.down)
+            val lines = buildList {
+                add(LineChartView.Series(series.values, chartColor, fill = true))
+                series.invested?.takeIf { it.size == series.values.size }?.let { inv ->
+                    add(
+                        LineChartView.Series(
+                            inv,
+                            ContextCompat.getColor(ctx, R.color.text_dim),
+                            fill = false,
+                            dashed = true,
+                        ),
+                    )
+                }
+            }
             b.historyChart.setData(
-                listOf(LineChartView.Series(series.values, chartColor, fill = true)),
+                lines,
                 LineChartView.Labels(
                     yFormat = { Fmt.money(it) },
                     xLabels = HistoryCalc.axisLabels(series.times, historyRange),

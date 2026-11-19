@@ -232,7 +232,9 @@ class MainActivity : AppCompatActivity() {
             val map = runCatching {
                 app.historyFetcher(p.assets.map { it.symbol }, requested)
             }.getOrDefault(emptyMap())
-            val series = HistoryCalc.valueSeries(p.assets, map)
+            val series = HistoryCalc.valueSeries(p.assets, map)?.let { base ->
+                base.copy(invested = HistoryCalc.investedSeries(p.assets, base.times))
+            }
             historyLoading = false
             historyFetchedAt = System.currentTimeMillis()
             if (series != null) historyCache[requested] = series

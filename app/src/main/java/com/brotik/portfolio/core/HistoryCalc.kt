@@ -18,7 +18,12 @@ enum class HistoryRange(
 }
 
 /** Ряд стоимости портфеля: таймстемпы и значения (в $). */
-data class HistorySeries(val times: List<Long>, val values: List<Double>)
+data class HistorySeries(
+    val times: List<Long>,
+    val values: List<Double>,
+    /** Вложенные средства к каждой точке (нарастающим итогом, $). */
+    val invested: List<Double>? = null,
+)
 
 /**
  * Стоимость портфеля во времени: для каждой точки берём цену каждой монеты
@@ -46,6 +51,31 @@ object HistoryCalc {
             values.add(sum)
         }
         return HistorySeries(base.map { it.time }, values)
+    }
+
+    /** Вложенные средства нарастающим итогом по тем же точкам времени, $. */
+    fun investedSeries(assets: List<Asset>, times: List<Long>): List<Double> {
+        if (times.isEmpty()) return emptyList()
+        val zone = ZoneId.systemDefault()
+        val events = assets.flatMap { a ->
+            a.entries.mapNotNull { e ->
+                val d = e.date ?: return@mapNotNull null
+                val sum = e.invested ?: return@mapNotNull null
+                if (sum == 0.0) return@mapNotNull null
+                d.atStartOfDay(zone).toInstant().toEpochMilli() to sum
+            }
+        }.sortedBy { it.first }
+        val out = ArrayList<Double>(times.size)
+        var i = 0
+        var cum = 0.0
+        for (t in times) {
+            while (i < events.size && events[i].first <= t) {
+                cum += events[i].second
+                i++
+            }
+            out.add(cum)
+        }
+        return out
     }
 
     /** Сумма купленного (с учётом продаж) к моменту времени. */

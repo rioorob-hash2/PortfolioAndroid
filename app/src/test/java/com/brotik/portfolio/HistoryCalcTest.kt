@@ -44,6 +44,22 @@ class HistoryCalcTest {
     }
 
     @Test
+    fun `invested series accumulates buys up to each point`() {
+        val a = Asset("BTC", "Bitcoin", "#F7931A").apply {
+            entries.add(buy("2026-01-10", 100.0, 10.0))
+            entries.add(buy("2026-02-10", 50.0, 20.0))
+        }
+        val times = listOf(
+            ts("2026-01-01"),
+            ts("2026-01-10"),
+            ts("2026-02-10"),
+            ts("2026-03-01"),
+        )
+        val inv = HistoryCalc.investedSeries(listOf(a), times)
+        assertEquals(listOf(0.0, 100.0, 150.0, 150.0), inv)
+    }
+
+    @Test
     fun `amount at time is binary searched`() {
         val timeline = listOf(1000L to 1.0, 2000L to 3.0, 3000L to 6.0)
         assertEquals(0.0, HistoryCalc.amountAt(timeline, 500L), 1e-9)
