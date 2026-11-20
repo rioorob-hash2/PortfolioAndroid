@@ -108,6 +108,7 @@
     <string name="updates_error">Не удалось проверить: %1$s</string>
     <string name="updates_no_apk">В релизе %1$s нет APK</string>
     <string name="updates_allow">Разрешите установку из этого приложения</string>
+    <string name="updates_permission_ok">Разрешение включено — нажмите «Скачать и установить».</string>
     <string name="updates_permission_hint">Разрешение «Установка неизвестных приложений» для Портфеля выключено — включите и повторите.</string>
 
     <string name="chart_value">Стоимость</string>
