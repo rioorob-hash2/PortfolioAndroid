@@ -96,6 +96,20 @@
     <string name="about_text">Журнал докупок по монетам с живыми ценами и графиками. Данные хранятся на телефоне, резервные копии — в папке на устройстве.</string>
     <string name="version">Версия %1$s</string>
 
+    <string name="updates_title">Обновления</string>
+    <string name="updates_idle">Обновления тянутся из GitHub Releases. Проверьте, есть ли новая версия.</string>
+    <string name="updates_check">Проверить обновления</string>
+    <string name="updates_install">Скачать и установить</string>
+    <string name="updates_checking">Проверяю…</string>
+    <string name="updates_latest">У вас последняя версия (%1$s)</string>
+    <string name="updates_available">Доступна версия %1$s (у вас %2$s)</string>
+    <string name="updates_downloading">Скачиваю… %1$d%%</string>
+    <string name="updates_ready">Скачано, открываю установщик…</string>
+    <string name="updates_error">Не удалось проверить: %1$s</string>
+    <string name="updates_no_apk">В релизе %1$s нет APK</string>
+    <string name="updates_allow">Разрешите установку из этого приложения</string>
+    <string name="updates_permission_hint">Разрешение «Установка неизвестных приложений» для Портфеля выключено — включите и повторите.</string>
+
     <string name="chart_value">Стоимость</string>
     <string name="chart_pnl">PnL</string>
     <string name="chart_amount">Кол-во</string>
@@ -165,4 +179,7 @@
     <string name="widget_description">Стоимость портфеля и PnL на рабочем столе</string>
     <string name="widget_updated">Цены: %1$s</string>
     <string name="widget_no_data">Цены не загружены</string>
+    <string name="empty_title">Пока нет монет</string>
+    <string name="empty_hint">Нажми + справа сверху, чтобы добавить монету и её докупки. Старые данные можно восстановить из резервной копии в настройках.</string>
 </resources>
+
