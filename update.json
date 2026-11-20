@@ -1,7 +1,7 @@
 {
-  "version": "1.11",
+  "version": "1.12",
   "apk_name": "app-prod.apk",
-  "apk_url": "https://github.com/rioorob-hash2/PortfolioAndroid/releases/download/v1.11/app-prod.apk",
+  "apk_url": "https://github.com/rioorob-hash2/PortfolioAndroid/releases/download/v1.12/app-prod.apk",
   "size_bytes": 12085010,
   "notes": "обновления из GitHub, пустой старт, аккуратный график"
 }
