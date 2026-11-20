@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android 12+ (data-extraction-rules).
+    Портфель и кэш цен исключены и из облачного бэкапа, и из переноса
+    между устройствами (device transfer). Остальное приложение бэкапит как обычно.
+-->
 <data-extraction-rules>
     <cloud-backup>
         <include domain="file" path="." />
+
+        <exclude domain="file" path="portfolio.json" />
+        <exclude domain="file" path="portfolio.json.tmp" />
+        <exclude domain="file" path="backup-latest.json" />
+        <exclude domain="sharedpref" path="prices.xml" />
+        <exclude domain="sharedpref" path="alerts.xml" />
+        <exclude domain="sharedpref" path="backup.xml" />
     </cloud-backup>
+
     <device-transfer>
         <include domain="file" path="." />
+
+        <exclude domain="file" path="portfolio.json" />
+        <exclude domain="file" path="portfolio.json.tmp" />
+        <exclude domain="file" path="backup-latest.json" />
+        <exclude domain="sharedpref" path="prices.xml" />
+        <exclude domain="sharedpref" path="alerts.xml" />
+        <exclude domain="sharedpref" path="backup.xml" />
     </device-transfer>
 </data-extraction-rules>
