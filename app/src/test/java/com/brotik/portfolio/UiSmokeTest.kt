@@ -27,6 +27,22 @@ class UiSmokeTest {
         app.priceFetcher = { emptyMap() }
         app.candleFetcher = { _, _ -> emptyList() }
         app.historyFetcher = { _, _ -> emptyMap() }
+        // Сид в публичной сборке пустой — данные для UI готовим сами.
+        app.store.save(TestFixture.portfolio())
+    }
+
+    @Test
+    fun emptyPortfolioShowsEmptyState() {
+        val app = ApplicationProvider.getApplicationContext<App>()
+        java.io.File(app.filesDir, "portfolio.json").delete()
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            scenario.onActivity { a ->
+                val empty = a.findViewById<android.view.View>(R.id.emptyState)
+                val list = a.findViewById<android.view.View>(R.id.list)
+                assertEquals(android.view.View.VISIBLE, empty.visibility)
+                assertEquals(android.view.View.GONE, list.visibility)
+            }
+        }
     }
 
     @Test
@@ -39,14 +55,14 @@ class UiSmokeTest {
 
                 val invested = a.findViewById<TextView>(R.id.investedValue)
                 assertEquals(
-                    "$2 995,00",
+                    "$1 500,00",
                     invested.text.toString().replace('\u00A0', ' ').replace('\u202F', ' '),
                 )
 
                 val list = a.findViewById<RecyclerView>(R.id.list)
                 assertNotNull(list)
-                // 2 карточки-заголовка (итоги с историей + распределение) + 7 активов
-                assertEquals(9, list.adapter!!.itemCount)
+                // 2 карточки-заголовка (итоги с историей + распределение) + 2 актива из фикстуры
+                assertEquals(4, list.adapter!!.itemCount)
             }
         }
     }
@@ -62,7 +78,8 @@ class UiSmokeTest {
                 val price = a.findViewById<TextView>(R.id.priceNow)
                 assertTrue("цена должна быть заполнена: ${price.text}", price.text.toString().startsWith("$"))
                 val entries = a.findViewById<RecyclerView>(R.id.entries)
-                assertEquals(10, entries.adapter!!.itemCount)
+                assertNotNull(entries.adapter)
+                assertEquals(2, entries.adapter!!.itemCount)
             }
         }
     }
