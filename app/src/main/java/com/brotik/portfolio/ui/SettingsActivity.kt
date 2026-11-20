@@ -15,6 +15,7 @@ import com.brotik.portfolio.BuildConfig
 import com.brotik.portfolio.R
 import com.brotik.portfolio.core.Alerts
 import com.brotik.portfolio.core.Fmt
+import com.brotik.portfolio.core.Updater
 import com.brotik.portfolio.data.AlertPrefs
 import com.brotik.portfolio.data.DownloadBackups
 import com.brotik.portfolio.databinding.ActivitySettingsBinding
@@ -86,8 +87,10 @@ class SettingsActivity : AppCompatActivity() {
         b.importBtn.setOnClickListener {
             importFile.launch(arrayOf("application/json", "text/plain", "application/octet-stream", "*/*"))
         }
-        b.resetSeed.setOnClickListener { confirmReset() }
         b.version.text = getString(R.string.version, BuildConfig.VERSION_NAME)
+
+        b.checkUpdates.setOnClickListener { checkUpdates() }
+        b.installUpdate.setOnClickListener { installUpdate() }
 
         setupAlerts()
         b.downloadFind.setOnClickListener { findDownloadBackups() }
@@ -326,23 +329,6 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun confirmReset() {
-        MaterialAlertDialogBuilder(this)
-            .setMessage(R.string.reset_seed_confirm)
-            .setNegativeButton(R.string.cancel, null)
-            .setPositiveButton(R.string.reset_seed) { _, _ ->
-                val seed = app.store.seed()
-                if (seed == null) {
-                    toast(getString(R.string.no_data))
-                    return@setPositiveButton
-                }
-                app.store.save(seed)
-                toast(getString(R.string.saved))
-                lifecycleScope.launch(Dispatchers.IO) { runCatching { app.backup.backup(seed) } }
-            }
-            .show()
-    }
-
     private fun parseNum(value: String?): Double? {
         if (value.isNullOrBlank()) return null
         val cleaned = value.trim().replace(" ", "").replace('\u00A0', ' ').replace(',', '.')
@@ -355,4 +341,74 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun toast(text: String) = Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+
+    // ------------------------------------------------------------ обновления
+
+    private var pendingRelease: Updater.Release? = null
+    private var updateBusy = false
+
+    private fun checkUpdates() {
+        if (updateBusy) return
+        updateBusy = true
+        b.checkUpdates.isEnabled = false
+        b.installUpdate.visibility = android.view.View.GONE
+        b.updateStatus.text = getString(R.string.updates_checking)
+        lifecycleScope.launch {
+            val release = runCatching { Updater.latest() }.getOrNull()
+            updateBusy = false
+            b.checkUpdates.isEnabled = true
+            if (release == null) {
+                b.updateStatus.text = getString(R.string.updates_error, "нет ответа от GitHub")
+                return@launch
+            }
+            if (release.tag.isBlank()) {
+                b.updateStatus.text = getString(R.string.updates_error, "релиз не найден")
+                return@launch
+            }
+            if (release.apkUrl.isBlank()) {
+                b.updateStatus.text = getString(R.string.updates_no_apk, release.tag)
+                return@launch
+            }
+            if (Updater.compare(release.tag, BuildConfig.VERSION_NAME) > 0) {
+                pendingRelease = release
+                val suffix = release.notes.takeIf { it.isNotBlank() }?.let { "\n$it" } ?: ""
+                b.updateStatus.text =
+                    getString(R.string.updates_available, release.tag, BuildConfig.VERSION_NAME) + suffix
+                b.installUpdate.visibility = android.view.View.VISIBLE
+            } else {
+                pendingRelease = null
+                b.updateStatus.text = getString(R.string.updates_latest, BuildConfig.VERSION_NAME)
+            }
+        }
+    }
+
+    private fun installUpdate() {
+        val release = pendingRelease ?: return
+        if (updateBusy) return
+        if (!Updater.canInstall(this)) {
+            b.updateStatus.text = getString(R.string.updates_permission_hint)
+            toast(getString(R.string.updates_allow))
+            Updater.openInstallPermission(this)
+            return
+        }
+        updateBusy = true
+        b.installUpdate.isEnabled = false
+        b.updateStatus.text = getString(R.string.updates_downloading, 0)
+        lifecycleScope.launch {
+            val result = Updater.download(this@SettingsActivity, release) { pct ->
+                runOnUiThread { if (!isFinishing) b.updateStatus.text = getString(R.string.updates_downloading, pct) }
+            }
+            updateBusy = false
+            b.installUpdate.isEnabled = true
+            val file = result.getOrElse {
+                b.updateStatus.text = getString(R.string.updates_error, it.message.orEmpty())
+                return@launch
+            }
+            b.updateStatus.text = getString(R.string.updates_ready)
+            runCatching { Updater.install(this@SettingsActivity, file) }.onFailure {
+                b.updateStatus.text = getString(R.string.updates_error, it.message.orEmpty())
+            }
+        }
+    }
 }
+
