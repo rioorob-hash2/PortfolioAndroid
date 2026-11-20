@@ -342,8 +342,19 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun toast(text: String) = Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 
+    override fun onResume() {
+        super.onResume()
+        // Вернулись с экрана «Установка неизвестных приложений» — если разрешение включили,
+        // снимаем подсказку и сразу пробуем скачать.
+        if (waitingForPermission && Updater.canInstall(this)) {
+            waitingForPermission = false
+            b.updateStatus.text = getString(R.string.updates_permission_ok)
+        }
+    }
+
     // ------------------------------------------------------------ обновления
 
+    private var waitingForPermission = false
     private var pendingRelease: Updater.Release? = null
     private var updateBusy = false
 
@@ -388,6 +399,7 @@ class SettingsActivity : AppCompatActivity() {
         val release = pendingRelease ?: return
         if (updateBusy) return
         if (!Updater.canInstall(this)) {
+            waitingForPermission = true
             b.updateStatus.text = getString(R.string.updates_permission_hint)
             toast(getString(R.string.updates_allow))
             Updater.openInstallPermission(this)
