@@ -151,14 +151,17 @@ class MainAdapter(
             val up = last >= first
             val chartColor = ContextCompat.getColor(ctx, if (up) R.color.up else R.color.down)
             val lines = buildList {
-                add(LineChartView.Series(series.values, chartColor, fill = true))
+                add(LineChartView.Series(series.values, chartColor, fill = true, strokeDp = 2.4f, glow = true))
                 series.invested?.takeIf { it.size == series.values.size }?.let { inv ->
                     add(
                         LineChartView.Series(
                             inv,
-                            ContextCompat.getColor(ctx, R.color.text_dim),
+                            ContextCompat.getColor(ctx, R.color.invested),
                             fill = false,
                             dashed = true,
+                            strokeDp = 1.7f,
+                            showEndDot = false,
+                            endLabel = "вложено",
                         ),
                     )
                 }
