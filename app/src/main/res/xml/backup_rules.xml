@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android 11 и ниже (full-backup-content).
+    Портфель, цены и настройки уведомлений НЕ уходят в Google-бэкап:
+    перенос между устройствами делается через «Экспорт в файл» /
+    «Импорт из файла» или копию portfolio-latest.json в Загрузках.
+-->
 <full-backup-content>
     <include domain="file" path="." />
+
+    <exclude domain="file" path="portfolio.json" />
+    <exclude domain="file" path="portfolio.json.tmp" />
+    <exclude domain="file" path="backup-latest.json" />
+    <exclude domain="sharedpref" path="prices.xml" />
+    <exclude domain="sharedpref" path="alerts.xml" />
+    <exclude domain="sharedpref" path="backup.xml" />
 </full-backup-content>
