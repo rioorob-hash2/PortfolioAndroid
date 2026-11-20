@@ -37,8 +37,8 @@ android {
         applicationId = "com.brotik.portfolio"
         minSdk = 29
         targetSdk = 35
-        versionCode = 12
-        versionName = "1.12"
+        versionCode = 13
+        versionName = "1.13"
     val testSuffix = (findProperty("testSuffix") as String?).orEmpty()
     if (testSuffix.isNotEmpty()) applicationIdSuffix = testSuffix
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
