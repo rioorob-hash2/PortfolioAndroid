@@ -57,7 +57,12 @@ object Updater {
         val text = httpGet(API, accept = "application/vnd.github+json")
         val json = JSONObject(text)
         val tag = json.optString("tag_name").removePrefix("v")
-        val notes = json.optString("body").lineSequence().firstOrNull { it.isNotBlank() }.orEmpty().take(300)
+        // В JSON поле body может быть null — optString вернёт строку "null", её не показываем.
+        val notes = json.optString("body")
+            .takeIf { it.isNotBlank() && it != "null" }
+            ?.lineSequence()?.firstOrNull { it.isNotBlank() }
+            ?.take(300)
+            .orEmpty()
         val assets = json.optJSONArray("assets")
         if (assets != null) {
             for (i in 0 until assets.length()) {
