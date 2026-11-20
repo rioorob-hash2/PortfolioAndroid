@@ -354,11 +354,13 @@ class SettingsActivity : AppCompatActivity() {
         b.installUpdate.visibility = android.view.View.GONE
         b.updateStatus.text = getString(R.string.updates_checking)
         lifecycleScope.launch {
-            val release = runCatching { Updater.latest() }.getOrNull()
+            val check = runCatching { Updater.check() }
+                .getOrElse { Updater.Check(null, it.message.orEmpty()) }
+            val release = check.release
             updateBusy = false
             b.checkUpdates.isEnabled = true
             if (release == null) {
-                b.updateStatus.text = getString(R.string.updates_error, "нет ответа от GitHub")
+                b.updateStatus.text = getString(R.string.updates_error, check.error.orEmpty())
                 return@launch
             }
             if (release.tag.isBlank()) {
