@@ -16,12 +16,16 @@ import java.net.URL
 /**
  * Обновления из GitHub Releases: проверка последнего релиза, скачивание APK
  * и передача его системному установщику. Никаких сторонних библиотек.
+ *
+ * Проверка идёт анонимно (токен в APK не зашит). Если GitHub API недоступен
+ * или лимитирует IP, пробуем маленький манифест update.json из ветки main.
  */
 object Updater {
 
     private const val OWNER = "rioorob-hash2"
-    private const val REPO = "PortfolioAndroid-releases"
+    private const val REPO = "PortfolioAndroid"
     private const val API = "https://api.github.com/repos/$OWNER/$REPO/releases/latest"
+    private const val MANIFEST = "https://raw.githubusercontent.com/$OWNER/$REPO/main/update.json"
     private const val UA = "PortfolioAndroid-updater"
 
     data class Release(
@@ -32,9 +36,25 @@ object Updater {
         val notes: String,
     )
 
-    /** Последний релиз; null — сеть/репозиторий недоступны. */
-    suspend fun latest(): Release? = withContext(Dispatchers.IO) {
-        val text = httpGet(API) ?: return@withContext null
+    data class Check(val release: Release?, val error: String?)
+
+    /** Последний релиз: сначала API, потом update.json из main. */
+    suspend fun check(): Check = withContext(Dispatchers.IO) {
+        val viaApi = runCatching { fromApi() }
+        viaApi.getOrNull()?.let { release ->
+            if (release.tag.isNotBlank()) return@withContext Check(release, null)
+        }
+        val apiError = viaApi.exceptionOrNull()?.let(::describe)
+        val viaManifest = runCatching { fromManifest() }
+        viaManifest.getOrNull()?.let { release ->
+            if (release.tag.isNotBlank()) return@withContext Check(release, null)
+        }
+        val manifestError = viaManifest.exceptionOrNull()?.let(::describe)
+        Check(null, listOfNotNull(apiError, manifestError).joinToString("; ").ifBlank { "нет ответа от GitHub" })
+    }
+
+    private fun fromApi(): Release {
+        val text = httpGet(API, accept = "application/vnd.github+json")
         val json = JSONObject(text)
         val tag = json.optString("tag_name").removePrefix("v")
         val notes = json.optString("body").lineSequence().firstOrNull { it.isNotBlank() }.orEmpty().take(300)
@@ -44,7 +64,7 @@ object Updater {
                 val asset = assets.getJSONObject(i)
                 val name = asset.optString("name")
                 if (!name.endsWith(".apk", ignoreCase = true)) continue
-                return@withContext Release(
+                return Release(
                     tag = tag,
                     apkUrl = asset.optString("browser_download_url"),
                     apkName = name,
@@ -53,8 +73,23 @@ object Updater {
                 )
             }
         }
-        Release(tag, "", "", 0, notes)
+        return Release(tag, "", "", 0, notes)
     }
+
+    private fun fromManifest(): Release {
+        val text = httpGet(MANIFEST, accept = "application/json")
+        val json = JSONObject(text)
+        return Release(
+            tag = json.optString("version").removePrefix("v"),
+            apkUrl = json.optString("apk_url"),
+            apkName = json.optString("apk_name").ifBlank { "app-prod.apk" },
+            sizeBytes = json.optLong("size_bytes"),
+            notes = json.optString("notes").take(300),
+        )
+    }
+
+    private fun describe(error: Throwable): String =
+        (error.javaClass.simpleName + ": " + (error.message ?: "")).trim().trimEnd(':').take(160)
 
     /** Сравнение версий «1.9» / «v1.10» по числовым частям. >0 — candidate новее current. */
     fun compare(candidate: String, current: String): Int {
@@ -142,18 +177,21 @@ object Updater {
         )
     }
 
-    private fun httpGet(url: String): String? {
+    private fun httpGet(url: String, accept: String): String {
         val conn = (URL(url).openConnection() as HttpURLConnection).apply {
             connectTimeout = 15_000
             readTimeout = 20_000
+            instanceFollowRedirects = true
             setRequestProperty("User-Agent", UA)
-            setRequestProperty("Accept", "application/vnd.github+json")
+            setRequestProperty("Accept", accept)
         }
-        return try {
-            if (conn.responseCode !in 200..299) null
-            else conn.inputStream.bufferedReader().use { it.readText() }
-        } catch (e: Exception) {
-            null
+        try {
+            val code = conn.responseCode
+            if (code !in 200..299) {
+                val body = conn.errorStream?.bufferedReader()?.use { it.readText() }.orEmpty()
+                throw IllegalStateException("HTTP $code ${body.take(120)}".trim())
+            }
+            return conn.inputStream.bufferedReader().use { it.readText() }
         } finally {
             conn.disconnect()
         }
