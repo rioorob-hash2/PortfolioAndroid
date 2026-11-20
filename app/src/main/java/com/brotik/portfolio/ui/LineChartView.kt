@@ -32,6 +32,12 @@ class LineChartView @JvmOverloads constructor(
         val fill: Boolean = false,
         val dashed: Boolean = false,
         val strokeDp: Float = 2.2f,
+        /** Точка на последнем значении. Для вспомогательных серий её лучше выключить. */
+        val showEndDot: Boolean = true,
+        /** Подпись у последней точки (например, «вложено»). */
+        val endLabel: String? = null,
+        /** Мягкое свечение под линией — для главной серии. */
+        val glow: Boolean = false,
     )
 
     data class Labels(
@@ -54,6 +60,12 @@ class LineChartView @JvmOverloads constructor(
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val labelBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = Color.parseColor("#121826")
+    }
+    private val labelBg = RectF()
+    private val textBounds = android.graphics.Rect()
     private val path = Path()
     private val contentRect = RectF()
 
@@ -167,20 +179,32 @@ class LineChartView @JvmOverloads constructor(
 
             linePaint.color = s.color
             linePaint.strokeWidth = dp(s.strokeDp)
-            linePaint.pathEffect = if (s.dashed) DashPathEffect(floatArrayOf(dp(5f), dp(4f)), 0f) else null
+            linePaint.pathEffect = if (s.dashed) DashPathEffect(floatArrayOf(dp(7f), dp(5f)), 0f) else null
+            if (s.glow) linePaint.setShadowLayer(dp(6f), 0f, 0f, alpha(s.color, 70)) else linePaint.clearShadowLayer()
             canvas.save()
             canvas.clipRect(left, top - dp(2f), left + (right - left) * progress, bottom + dp(2f))
             canvas.drawPath(path, linePaint)
             canvas.restore()
             linePaint.pathEffect = null
+            linePaint.clearShadowLayer()
 
             // точка на последнем значении
             val lastX = pts.last().first
             val lastY = pts.last().second
-            dotPaint.color = alpha(s.color, 40)
-            canvas.drawCircle(lastX, lastY, dp(6f), dotPaint)
-            dotPaint.color = s.color
-            canvas.drawCircle(lastX, lastY, dp(3f), dotPaint)
+            if (s.showEndDot) {
+                dotPaint.color = alpha(s.color, 40)
+                canvas.drawCircle(lastX, lastY, dp(6f), dotPaint)
+                dotPaint.color = s.color
+                canvas.drawCircle(lastX, lastY, dp(3f), dotPaint)
+            }
+            if (s.endLabel != null) {
+                textPaint.textSize = dp(9f)
+                textPaint.color = alpha(s.color, 230)
+                textPaint.textAlign = Paint.Align.RIGHT
+                val labelY = if (lastY - dp(7f) > top + dp(9f)) lastY - dp(7f) else lastY + dp(12f)
+                canvas.drawText(s.endLabel, lastX - dp(4f), labelY, textPaint)
+                textPaint.textAlign = Paint.Align.LEFT
+            }
         }
 
         if (zeroLine) {
@@ -203,7 +227,19 @@ class LineChartView @JvmOverloads constructor(
                 val label = labels.yFormat(value)
                 // верхнюю подпись рисуем под линией, чтобы её не срезало краем
                 val ty = if (i == 0) y + dp(13f) else y - dp(3f)
-                canvas.drawText(label, contentRect.left + dp(2f), ty, textPaint)
+                // полупрозрачная подложка: подпись остаётся читаемой поверх линий
+                val tw = textPaint.measureText(label)
+                textPaint.getTextBounds(label, 0, label.length, textBounds)
+                val padX = dp(3f)
+                val padY = dp(1.5f)
+                labelBg.set(
+                    contentRect.left - padX,
+                    ty - textBounds.height() - padY,
+                    contentRect.left + tw + padX,
+                    ty + padY,
+                )
+                canvas.drawRoundRect(labelBg, dp(3f), dp(3f), labelBgPaint)
+                canvas.drawText(label, contentRect.left, ty, textPaint)
             }
         }
     }
