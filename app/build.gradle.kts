@@ -37,8 +37,8 @@ android {
         applicationId = "com.brotik.portfolio"
         minSdk = 29
         targetSdk = 35
-        versionCode = 10
-        versionName = "1.10"
+        versionCode = 11
+        versionName = "1.11"
     val testSuffix = (findProperty("testSuffix") as String?).orEmpty()
     if (testSuffix.isNotEmpty()) applicationIdSuffix = testSuffix
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -132,5 +132,6 @@ tasks.withType<Test>().configureEach {
         showStandardStreams = true
     }
 }
+
 
 
