@@ -212,7 +212,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun render(p: Portfolio) {
+        val empty = p.assets.isEmpty()
         adapter.submit(p, prices, updatedAt, historySeries, historyRange, historyLoading)
+        b.emptyState.visibility = if (empty) android.view.View.VISIBLE else android.view.View.GONE
+        b.list.visibility = if (empty) android.view.View.GONE else android.view.View.VISIBLE
     }
 
     private fun loadHistory(force: Boolean = false) {
