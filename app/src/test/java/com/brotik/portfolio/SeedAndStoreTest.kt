@@ -38,7 +38,7 @@ class SeedAndStoreTest {
 
         val loaded = store.load()
         assertNotNull(loaded)
-        assertEquals(8, loaded!!.assets.size)
+        assertEquals(1, loaded!!.assets.size)
         assertNotNull(loaded.asset("DOGE"))
         assertEquals("#C2A633", loaded.asset("DOGE")!!.color)
         assertEquals(0, loaded.asset("DOGE")!!.entries.size)
@@ -46,42 +46,21 @@ class SeedAndStoreTest {
 
     @Test
     fun `removing an asset drops it from storage`() {
-        val p = store.loadOrSeed()
+        store.save(TestFixture.portfolio())
+        val p = store.load()!!
         p.assets.removeAll { it.symbol == "ARB" }
         store.save(p)
 
         assertNull(store.load()!!.asset("ARB"))
-        assertEquals(6, store.load()!!.assets.size)
+        assertEquals(1, store.load()!!.assets.size)
     }
 
     @Test
-    fun `seed contains seven assets and real spreadsheet totals`() {
+    fun `public seed has no personal assets`() {
         val p = store.seed()
         assertNotNull(p)
-        p!!
-        assertEquals(7, p.assets.size)
-        assertEquals(
-            listOf("BTC", "ETH", "TON", "OP", "SOL", "ARB", "LTC"),
-            p.assets.map { it.symbol },
-        )
-
-        val btc = p.asset("BTC")!!
-        val t = Calc.totals(btc.entries, null)
-        assertEquals(1260.0, t.invested, 1e-9)
-        assertEquals(0.01775285563, t.amount, 1e-10)
-
-        val expectedAmounts = mapOf(
-            "ETH" to 0.1948984917,
-            "TON" to 411.1815085555,
-            "OP" to 559.4910898832,
-            "SOL" to 2.5346695613,
-            "LTC" to 4.5273368607,
-        )
-        expectedAmounts.forEach { (sym, expected) ->
-            val asset = p.asset(sym)!!
-            assertEquals("$sym amount", expected, Calc.totals(asset.entries, null).amount, 1e-9)
-        }
-        assertEquals(0, p.asset("ARB")!!.entries.size)
+        // В публичной сборке личных данных в assets нет — пользователь начинает с пустого портфеля.
+        assertEquals(0, p!!.assets.size)
     }
 
     @Test
@@ -113,7 +92,7 @@ class SeedAndStoreTest {
 
     @Test
     fun `json roundtrip of portfolio`() {
-        val p = store.seed()!!
+        val p = TestFixture.portfolio()
         val json = com.brotik.portfolio.core.EntryJson.toJson(p).toString()
         assertTrue(json.contains("\"assets\""))
         val back = com.brotik.portfolio.core.EntryJson.fromJson(JSONObject(json))
