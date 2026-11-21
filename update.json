@@ -1,7 +1,7 @@
 {
-  "version": "1.14",
+  "version": "1.15",
   "apk_name": "app-prod.apk",
-  "apk_url": "https://github.com/rioorob-hash2/PortfolioAndroid/releases/download/v1.14/app-prod.apk",
-  "size_bytes": 12085774,
-  "notes": "обновления из GitHub, пустой старт, аккуратный график"
+  "apk_url": "https://github.com/rioorob-hash2/PortfolioAndroid/releases/download/v1.15/app-prod.apk",
+  "size_bytes": 12257839,
+  "notes": "иконки монет в списке портфеля и в шапке экрана монеты"
 }
