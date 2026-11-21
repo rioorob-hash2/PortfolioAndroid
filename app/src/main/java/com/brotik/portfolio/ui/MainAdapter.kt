@@ -233,10 +233,26 @@ class MainAdapter(
         fun bind(asset: Asset) {
             val ctx = b.root.context
             val color = colorOf(asset.symbol)
-            val badge = b.coinBadge.background.mutate() as GradientDrawable
-            badge.setColor(color)
-            b.coinBadge.text = asset.symbol
-            b.coinBadge.setTextColor(badgeTextColor(color))
+            // Есть официальный логотип — показываем иконку, иначе старый бейдж с буквами.
+            val icon = CoinIcons.drawableFor(asset.symbol)
+            if (icon != null) {
+                b.coinIcon.setImageResource(icon)
+                b.coinIcon.visibility = View.VISIBLE
+                b.coinBadge.visibility = View.GONE
+            } else {
+                b.coinIcon.visibility = View.GONE
+                b.coinBadge.visibility = View.VISIBLE
+                val badge = b.coinBadge.background.mutate() as GradientDrawable
+                badge.setColor(color)
+                b.coinBadge.text = asset.symbol
+                b.coinBadge.maxLines = 1
+                // Длинные тикеры (HYPE) не должны переноситься внутри круглого бейджа.
+                b.coinBadge.setTextSize(
+                    android.util.TypedValue.COMPLEX_UNIT_SP,
+                    if (asset.symbol.length > 3) 8.5f else 11f,
+                )
+                b.coinBadge.setTextColor(badgeTextColor(color))
+            }
 
             val t = Calc.totals(asset.entries, prices[asset.symbol])
             b.name.text = asset.title

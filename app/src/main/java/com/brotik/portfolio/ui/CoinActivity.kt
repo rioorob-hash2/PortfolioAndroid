@@ -100,6 +100,30 @@ class CoinActivity : AppCompatActivity() {
         b.toolbar.title = "${a.symbol} · ${a.title}"
         b.toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         b.toolbar.setNavigationOnClickListener { finish() }
+        bindCoinIcon(a)
+    }
+
+    /** Логотип монеты в шапке карточки; нет иконки — бейдж с буквами тикера. */
+    private fun bindCoinIcon(a: Asset) {
+        val icon = CoinIcons.drawableFor(a.symbol)
+        if (icon != null) {
+            b.coinIcon.setImageResource(icon)
+            b.coinIcon.visibility = android.view.View.VISIBLE
+            b.coinBadge.visibility = android.view.View.GONE
+            return
+        }
+        b.coinIcon.visibility = android.view.View.GONE
+        b.coinBadge.visibility = android.view.View.VISIBLE
+        b.coinBadge.text = a.symbol.take(4)
+        b.coinBadge.maxLines = 1
+        b.coinBadge.setTextSize(
+            android.util.TypedValue.COMPLEX_UNIT_SP,
+            if (a.symbol.length > 3) 9f else 12f,
+        )
+        val color = a.colorInt
+        (b.coinBadge.background.mutate() as android.graphics.drawable.GradientDrawable).setColor(color)
+        val dark = android.graphics.Color.luminance(color) > 0.45f
+        b.coinBadge.setTextColor(if (dark) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
     }
 
     private fun setupList() {
